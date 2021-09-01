@@ -25,13 +25,14 @@ function urlB64ToUint8Array(base64String) {
   return outputArray;
 }
 
+// this code checks if the service worker and push messaging is supported 
+// by the current browser and registers the service worker
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.log('Service Worker and Push is supported');
 
   navigator.serviceWorker.register('sw.js')
   .then(function(swReg) {
     console.log('Service Worker is registered', swReg);
-
     swRegistration = swReg;
     initializeUI();
   })
@@ -43,58 +44,61 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
   pushButton.textContent = 'Push Not Supported';
 }
 
-// will check if the user is currently subscribed, and one called updateBtn which will enable our button and change the text if the user is subscribed or not.
 
+// will check if the user is currently subscribed, and  call
+// updateBtn which will enable our button and change the text if 
+// the user is subscribed or not.
 function initializeUI() {
-
   pushButton.addEventListener('click', function() {
     pushButton.disabled = true;
     if (isSubscribed) {
-      // TODO: Unsubscribe user
+      // Unsubscribe user
       unsubscribeUser('subs1');
       unsubscribeUser('subs2');
     } else {
+      //subscribe the user
       subscribeUser('subs1');
       subscribeUser('subs2');
     }
   });
-
   // Set the initial subscription value
+  //getSubscription() is a method that returns a promise 
+  //that resolves with the current subscription if there is one, 
+  //otherwise it'll return null
   swRegistration.pushManager.getSubscription()
   .then(function(subscription) {
     isSubscribed = !(subscription === null);
 
     if (isSubscribed) {
       console.log('User IS subscribed.');
-      console.log(`swreg ${subscription.endpoint}`);
+      //console.log(`swreg ${subscription.endpoint}`);
     } else {
       console.log('User is NOT subscribed.');
     }
-
     updateBtn();
   });
 }
 
 // sets the text of the button to enable or disable 
 function updateBtn() {
-
   if (Notification.permission === 'denied') {
     pushButton.textContent = 'Push Messaging Blocked.';
     pushButton.disabled = true;
     DisplaySubscriptionInformation(null);
     return;
   }
-
+  //changes the text depending on the whether the user
+  // is subscribed or not and then enables the button.
   if (isSubscribed) {
     pushButton.textContent = 'Disable Push Messaging';
   } else {
     pushButton.textContent = 'Enable Push Messaging';
   }
-
   pushButton.disabled = false;
 }
 
-// Service Worker registered s subscribed to a specific AppServerKey here
+
+// Service Worker registered is subscribed to a specific AppServerKey here
 function subscribeUser(subs_num) {
   const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
   swRegistration.pushManager.subscribe({
@@ -111,6 +115,8 @@ function subscribeUser(subs_num) {
     isSubscribed = true;
 
     updateBtn();
+
+
   })
   .catch(function(err) {
     console.log('Failed to subscribe the user: ', err);
@@ -120,8 +126,7 @@ function subscribeUser(subs_num) {
 
 // updates the main web page to show the subscription details
 function DisplaySubscriptionInformation(subscription, subs_num) {
-  // TODO: Send subscription to application server
-
+  //  Send subscription to application server
   // const subscriptionJson = document.querySelector('.js-subscription-json');
   const subscriptionJson = document.getElementById(subs_num);
   const subscriptionDetails = document.querySelector('.js-subscription-details');
