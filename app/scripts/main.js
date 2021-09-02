@@ -151,6 +151,7 @@ function DisplaySubscriptionInformation(subscription, subs_num) {
     subscriptionJson.textContent = JSON.stringify(subscription.endpoint);
     //subscriptionDetails.classList.remove('is-invisible');
   } else {
+    subscriptionJson.textContent = '';
     //subscriptionDetails.classList.add('is-invisible');
   }
 }
@@ -168,7 +169,8 @@ function unsubscribeUser() {
   })
   .then(function() {
     
-    DisplaySubscriptionInformation(null);
+    DisplaySubscriptionInformation(null, 'subs1');
+    DisplaySubscriptionInformation(null, 'subs2');
 
     console.log('User is unsubscribed.');
     isSubscribed = false;
