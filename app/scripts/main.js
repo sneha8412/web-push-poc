@@ -2,7 +2,7 @@
 
 'use strict';
 
-const applicationServerPublicKey = 'BN8NbJZV5Gi4gnOqtrJVi0NSm3ZS0Y-eeS2idexC687k3EZ6IU1QOlCZ5sMl5Pv2hwsZKfrT-VSJIAcAeluAHD0'; 
+const applicationServerPublicKey = 'BKfdJA_38dfBR-lV_IDIJhg4xKH92gZYuQtQslB9RhUBaLeoeVhcrBq0JDXGVFvUYC99uPIR8Opj4zt_oBlqJ8s'; 
 //'BCz2SjrXWb_FDChmq2cXkRWc7vkCCGKvAw5xy8gbTZ9oq99v66zXldG6FQvvP23Qf4e0kykwgVImAUVWHYBlJsA';
 
 const pushButton = document.querySelector('.js-push-btn');
@@ -53,8 +53,8 @@ function initializeUI() {
     pushButton.disabled = true;
     if (isSubscribed) {
       // Unsubscribe user
-      unsubscribeUser('subs1');
-      unsubscribeUser('subs2');
+      unsubscribeUser();
+      //unsubscribeUser('subs2');
     } else {
       //subscribe the user
       subscribeUser('subs1');
@@ -71,10 +71,12 @@ function initializeUI() {
 
     if (isSubscribed) {
       console.log('User IS subscribed.');
-      //console.log(`swreg ${subscription.endpoint}`);
+      console.log(`serviceworker is registerd to this endpoint ${subscription.endpoint}`);
+
     } else {
       console.log('User is NOT subscribed.');
     }
+  
     updateBtn();
   });
 }
@@ -84,7 +86,7 @@ function updateBtn() {
   if (Notification.permission === 'denied') {
     pushButton.textContent = 'Push Messaging Blocked.';
     pushButton.disabled = true;
-    DisplaySubscriptionInformation(null);
+    // DisplaySubscriptionInformation(null);
     return;
   }
   //changes the text depending on the whether the user
@@ -116,6 +118,9 @@ function subscribeUser(subs_num) {
 
     updateBtn();
 
+    // update the HTMl element to show the subscription.endpoint value 
+    const swSubsEndpointDisplay = document.getElementById('swsubs');
+    swSubsEndpointDisplay.textContent = JSON.stringify(subscription.endpoint);
 
   })
   .catch(function(err) {
@@ -128,19 +133,30 @@ function subscribeUser(subs_num) {
 function DisplaySubscriptionInformation(subscription, subs_num) {
   //  Send subscription to application server
   // const subscriptionJson = document.querySelector('.js-subscription-json');
-  const subscriptionJson = document.getElementById(subs_num);
-  const subscriptionDetails = document.querySelector('.js-subscription-details');
+
+  let subscriptionJson = null;
+
+  if (subs_num)
+  {
+    subscriptionJson = document.getElementById(subs_num);
+  }
+  else
+  {
+    subscriptionJson = document.querySelector('.js-subscription-details');
+  }
+
+  //const subscriptionDetails = document.querySelector('.js-subscription-details');
 
   if (subscription) {
-    subscriptionJson.textContent = JSON.stringify(subscription);
-    subscriptionDetails.classList.remove('is-invisible');
+    subscriptionJson.textContent = JSON.stringify(subscription.endpoint);
+    //subscriptionDetails.classList.remove('is-invisible');
   } else {
     //subscriptionDetails.classList.add('is-invisible');
   }
 }
 
 
-function unsubscribeUser(subs_num) {
+function unsubscribeUser() {
   swRegistration.pushManager.getSubscription()
   .then(function(subscription) {
     if (subscription) {
@@ -151,12 +167,19 @@ function unsubscribeUser(subs_num) {
     console.log('Error unsubscribing', error);
   })
   .then(function() {
-    DisplaySubscriptionInformation(null, subs_num);
+    
+    DisplaySubscriptionInformation(null);
 
     console.log('User is unsubscribed.');
     isSubscribed = false;
 
     updateBtn();
+
+     // update the HTMl element to show the subscription.endpoint value 
+     const swSubsEndpointDisplay = document.getElementById('swsubs');
+     swSubsEndpointDisplay.textContent = '';
   });
 }
 
+
+    
