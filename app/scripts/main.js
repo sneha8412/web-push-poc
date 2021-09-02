@@ -27,6 +27,7 @@ function urlB64ToUint8Array(base64String) {
 
 // this code checks if the service worker and push messaging is supported 
 // by the current browser and registers the service worker
+//feature detection, in case there is an older version of the browser
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.log('Service Worker and Push is supported');
 
