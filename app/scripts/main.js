@@ -218,11 +218,11 @@ function unsubscribeUser() {
     //call the getsubscription() and return the output on the webpage for each subs
     GetAndDisplaySWSubsEndpoint('subs1');
     GetAndDisplaySWSubsEndpoint('subs2');
-    GetAndDisplaySWSubsEndpoint('subs3');
+    GetAndDisplaySWSubsEndpoint('subs3'); //changes made
   });
 }
 
-
+//
 function InitialzeResubscribe() {
   pushResubscribeButton.addEventListener('click', function() {
     //subscribe the user
@@ -230,6 +230,7 @@ function InitialzeResubscribe() {
   });
 }
 
+// Resubscribe for  new button 
 function resubscribeUser() {
   const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
   swRegistration.pushManager.subscribe({
