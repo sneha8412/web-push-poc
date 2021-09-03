@@ -15,10 +15,8 @@ function urlB64ToUint8Array(base64String) {
   const base64 = (base64String + padding)
     .replace(/\-/g, '+')
     .replace(/_/g, '/');
-
   const rawData = window.atob(base64);
   const outputArray = new Uint8Array(rawData.length);
-
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
   }
@@ -30,13 +28,12 @@ function urlB64ToUint8Array(base64String) {
 //feature detection, in case there is an older version of the browser
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.log('Service Worker and Push is supported');
-
   navigator.serviceWorker.register('sw.js')
   .then(function(swReg) {
     console.log('Service Worker is registered', swReg);
     swRegistration = swReg;
     initializeUI();
-    InitialzeResubscribe();
+    InitialzeResubscribe(); //3rd subscription
   })
   .catch(function(error) {
     console.error('Service Worker Error', error);
@@ -63,23 +60,15 @@ function initializeUI() {
       subscribeUser('subs2');
     }
   });
-
-  // Set the initial subscription value
-  //getSubscription() is a method that returns a promise 
-  //that resolves with the current subscription if there is one, 
-  //otherwise it'll return null
   swRegistration.pushManager.getSubscription()
   .then(function(subscription) {
     isSubscribed = !(subscription === null);
-
     if (isSubscribed) {
       console.log('User IS subscribed.');
       console.log(`serviceworker is registerd to this endpoint ${subscription.endpoint}`);
-
     } else {
       console.log('User is NOT subscribed.');
     }
-  
     updateBtn();
   });
 }
@@ -103,7 +92,7 @@ function updateBtn() {
 }
 
 
-// Service Worker registered is subscribed to a specific AppServerKey here
+//-----------SUBSCRIBE USER-----------------------------------------------
 function subscribeUser(subs_num) {
   const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
   swRegistration.pushManager.subscribe({
@@ -129,12 +118,12 @@ function subscribeUser(subs_num) {
     updateBtn();
   });
 }
-
+//------------DISPLAY---------------------------------------------
+//Displays the 3rd subscription and SW subscription endpoint
 function GetAndDisplaySWSubsEndpoint(subs_num)
 {
   swRegistration.pushManager.getSubscription()
   .then(function(subscription) {
-    
       if(subs_num === "subs1")
       {
         DisplaySWSubscriptionEndpoint(subscription, "swsubs1");
@@ -147,17 +136,16 @@ function GetAndDisplaySWSubsEndpoint(subs_num)
       {
         DisplaySWSubscriptionEndpoint(subscription, "swsubs3");
       }
-
   })
   .catch(function(error) {
     console.log(`Error getting subscription for ${subs_num}`, error);
   });
 }
 
+//Service Worker subscription endpoint Display
 function DisplaySWSubscriptionEndpoint(subscription, swsubs_num)
 {
   const swsubs = document.getElementById(swsubs_num);
-
   if (subscription)
   {
     swsubs.textContent = subscription.endpoint;
@@ -168,11 +156,10 @@ function DisplaySWSubscriptionEndpoint(subscription, swsubs_num)
   }
 }
 
-// updates the main web page to show the subscription details
+// Displays subscription details
 function DisplaySubscriptionInformation(subscription, subs_num) {
   //  Send subscription to application server
   let subscriptionJson = null;
-
   if (subs_num)
   {
     subscriptionJson = document.getElementById(subs_num);
@@ -181,18 +168,13 @@ function DisplaySubscriptionInformation(subscription, subs_num) {
   {
     subscriptionJson = document.querySelector('.js-subscription-details');
   }
-
-  //const subscriptionDetails = document.querySelector('.js-subscription-details');
-
   if (subscription) {
-    subscriptionJson.textContent = subscription.endpoint;
-    //subscriptionDetails.classList.remove('is-invisible');
+    subscriptionJson.textContent = subscription.endpoint;  
   } else {
     subscriptionJson.textContent = '';
-    //subscriptionDetails.classList.add('is-invisible');
   }
 }
-
+//------------------------------------------------------------------------------------
 
 function unsubscribeUser() {
   swRegistration.pushManager.getSubscription()
@@ -208,11 +190,10 @@ function unsubscribeUser() {
     
     DisplaySubscriptionInformation(null, 'subs1');
     DisplaySubscriptionInformation(null, 'subs2');
-    DisplaySubscriptionInformation(null, 'subs3');
+    DisplaySubscriptionInformation(null, 'subs3');//changes made
 
     console.log('User is unsubscribed.');
     isSubscribed = false;
-
     updateBtn();
 
     //call the getsubscription() and return the output on the webpage for each subs
@@ -222,7 +203,7 @@ function unsubscribeUser() {
   });
 }
 
-//
+//------------3rd SUBSCRIPTION-----------------------------------------------------------------------
 function InitialzeResubscribe() {
   pushResubscribeButton.addEventListener('click', function() {
     //subscribe the user
@@ -230,7 +211,7 @@ function InitialzeResubscribe() {
   });
 }
 
-// Resubscribe for  new button 
+// Resubscribe for new button 
 function resubscribeUser() {
   const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
   swRegistration.pushManager.subscribe({
@@ -244,7 +225,6 @@ function resubscribeUser() {
     DisplaySubscriptionInformation(subscription, 'subs3');
 
     GetAndDisplaySWSubsEndpoint('subs3');
-
   })
   .catch(function(err) {
     console.log('Failed to subscribe the user: ', err);
