@@ -3,9 +3,9 @@
 'use strict';
 
 const applicationServerPublicKey = 'BKfdJA_38dfBR-lV_IDIJhg4xKH92gZYuQtQslB9RhUBaLeoeVhcrBq0JDXGVFvUYC99uPIR8Opj4zt_oBlqJ8s'; 
-//'BCz2SjrXWb_FDChmq2cXkRWc7vkCCGKvAw5xy8gbTZ9oq99v66zXldG6FQvvP23Qf4e0kykwgVImAUVWHYBlJsA';
 
 const pushButton = document.querySelector('.js-push-btn');
+const pushResubscribeButton = document.querySelector('.js-subscribepush-btn');
 
 let isSubscribed = false;
 let swRegistration = null;
@@ -36,6 +36,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
     console.log('Service Worker is registered', swReg);
     swRegistration = swReg;
     initializeUI();
+    InitialzeResubscribe();
   })
   .catch(function(error) {
     console.error('Service Worker Error', error);
@@ -62,6 +63,7 @@ function initializeUI() {
       subscribeUser('subs2');
     }
   });
+
   // Set the initial subscription value
   //getSubscription() is a method that returns a promise 
   //that resolves with the current subscription if there is one, 
@@ -119,12 +121,8 @@ function subscribeUser(subs_num) {
 
     updateBtn();
 
-    // update the HTMl element to show the subscription.endpoint value 
-    const swSubsEndpointDisplay = document.getElementById('swsubs');
-    swSubsEndpointDisplay.textContent = subscription.endpoint;
-
     //call the getsubscription() and return the output on the webpage for each subs
-
+    GetAndDisplaySWSubsEndpoint(subs_num)
   })
   .catch(function(err) {
     console.log('Failed to subscribe the user: ', err);
@@ -132,11 +130,47 @@ function subscribeUser(subs_num) {
   });
 }
 
+function GetAndDisplaySWSubsEndpoint(subs_num)
+{
+  swRegistration.pushManager.getSubscription()
+  .then(function(subscription) {
+    
+      if(subs_num === "subs1")
+      {
+        DisplaySWSubscriptionEndpoint(subscription, "swsubs1");
+      }
+      else if (subs_num === "subs2")
+      {
+        DisplaySWSubscriptionEndpoint(subscription, "swsubs2");
+      }
+      else if (subs_num === "subs3")
+      {
+        DisplaySWSubscriptionEndpoint(subscription, "swsubs3");
+      }
+
+  })
+  .catch(function(error) {
+    console.log(`Error getting subscription for ${subs_num}`, error);
+  });
+}
+
+function DisplaySWSubscriptionEndpoint(subscription, swsubs_num)
+{
+  const swsubs = document.getElementById(swsubs_num);
+
+  if (subscription)
+  {
+    swsubs.textContent = subscription.endpoint;
+  }
+  else
+  {
+    swsubs.textContent = '';
+  }
+}
+
 // updates the main web page to show the subscription details
 function DisplaySubscriptionInformation(subscription, subs_num) {
   //  Send subscription to application server
-  // const subscriptionJson = document.querySelector('.js-subscription-json');
-
   let subscriptionJson = null;
 
   if (subs_num)
@@ -174,17 +208,45 @@ function unsubscribeUser() {
     
     DisplaySubscriptionInformation(null, 'subs1');
     DisplaySubscriptionInformation(null, 'subs2');
+    DisplaySubscriptionInformation(null, 'subs3');
 
     console.log('User is unsubscribed.');
     isSubscribed = false;
 
     updateBtn();
 
-     // update the HTMl element to show the subscription.endpoint value 
-     const swSubsEndpointDisplay = document.getElementById('swsubs');
-     swSubsEndpointDisplay.textContent = '';
+    //call the getsubscription() and return the output on the webpage for each subs
+    GetAndDisplaySWSubsEndpoint('subs1');
+    GetAndDisplaySWSubsEndpoint('subs2');
+    GetAndDisplaySWSubsEndpoint('subs3');
   });
 }
 
 
+function InitialzeResubscribe() {
+  pushResubscribeButton.addEventListener('click', function() {
+    //subscribe the user
+    resubscribeUser('subs3');
+  });
+}
+
+function resubscribeUser() {
+  const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
+  swRegistration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: applicationServerKey
+  })
+  .then(function(subscription) {
+    console.log('User is subscribed.');
+    console.log(subscription.endpoint);
+
+    DisplaySubscriptionInformation(subscription, 'subs3');
+
+    GetAndDisplaySWSubsEndpoint('subs3');
+
+  })
+  .catch(function(err) {
+    console.log('Failed to subscribe the user: ', err);
+  });
+}
     

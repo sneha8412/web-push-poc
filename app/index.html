@@ -26,28 +26,34 @@
         Enable Push Messaging
       </button>
     </p>
-    <p>Subscription Object Returned By Calling PushManager.Subscribe 1st Time</p>
+    <p>Subscription Endpoint when PushManager.Subscribe - 1st Time</p>
     <section class="subscription-details js-subscription-details">
       <pre><code class="js-subscription-json">
         <div id="subs1"></div>
       </code></pre>
     </section>
+    <p> ServiceWorker is registered to: </p>
+    <section>
+      <pre><code class="js-serviceWorker-json">
+        <div id="swsubs1"></div>
+      </code></pre>
+    </section>
     <br/>
     <br/>
-    <p>Subscription Object Returned By Calling PushManager.Subscribe 2nd Time</p>
+    <p>Subscription Endpoint when Calling PushManager.Subscribe 2nd Time</p>
     <section class="subscription-details js-subscription-details">
       <pre><code class="js-subscription-json">
         <div id="subs2"></div>
       </code></pre>
     </section>
-    <br/>
-    </br>
     <p> Service worker is registered to: </p>
     <section>
       <pre><code class="js-serviceWorker-json">
-        <div id="swsubs"></div>
+        <div id="swsubs2"></div>
       </code></pre>
     </section>
+    <br/>
+    </br>
     <br/>
     <br/>
     <p>
@@ -55,6 +61,19 @@
         Resubscribe to Push Messaging
       </button>
     </p>
+
+    <p>Re-Subscription Endpoint when Calling PushManager.Subscribe 3rd Time</p>
+    <section class="subscription-details js-subscription-details">
+      <pre><code class="js-subscription-json">
+        <div id="subs3"></div>
+      </code></pre>
+    </section>
+    <p> Service worker is registered to: </p>
+    <section>
+      <pre><code class="js-serviceWorker-json">
+        <div id="swsubs3"></div>
+      </code></pre>
+    </section>
   </main>
 
   <script src="scripts/main.js"></script>
