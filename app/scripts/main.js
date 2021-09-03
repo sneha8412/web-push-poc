@@ -121,7 +121,7 @@ function subscribeUser(subs_num) {
 
     // update the HTMl element to show the subscription.endpoint value 
     const swSubsEndpointDisplay = document.getElementById('swsubs');
-    swSubsEndpointDisplay.textContent = JSON.stringify(subscription.endpoint);
+    swSubsEndpointDisplay.textContent = subscription.endpoint;
 
   })
   .catch(function(err) {
@@ -149,7 +149,7 @@ function DisplaySubscriptionInformation(subscription, subs_num) {
   //const subscriptionDetails = document.querySelector('.js-subscription-details');
 
   if (subscription) {
-    subscriptionJson.textContent = JSON.stringify(subscription.endpoint);
+    subscriptionJson.textContent = subscription.endpoint;
     //subscriptionDetails.classList.remove('is-invisible');
   } else {
     subscriptionJson.textContent = '';
