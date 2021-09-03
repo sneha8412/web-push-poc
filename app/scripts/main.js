@@ -95,9 +95,9 @@ function updateBtn() {
   //changes the text depending on the whether the user
   // is subscribed or not and then enables the button.
   if (isSubscribed) {
-    pushButton.textContent = 'Disable Push Messaging';
+    pushButton.textContent = 'Unsubscribe Push Messaging';
   } else {
-    pushButton.textContent = 'Enable Push Messaging';
+    pushButton.textContent = 'Two Subscribe calls to Push Messaging';
   }
   pushButton.disabled = false;
 }
