@@ -123,6 +123,8 @@ function subscribeUser(subs_num) {
     const swSubsEndpointDisplay = document.getElementById('swsubs');
     swSubsEndpointDisplay.textContent = subscription.endpoint;
 
+    //call the getsubscription() and return the output on the webpage for each subs
+
   })
   .catch(function(err) {
     console.log('Failed to subscribe the user: ', err);
