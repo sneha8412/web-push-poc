@@ -2,7 +2,7 @@
 
 'use strict';
 
-const applicationServerPublicKey = 'BKfdJA_38dfBR-lV_IDIJhg4xKH92gZYuQtQslB9RhUBaLeoeVhcrBq0JDXGVFvUYC99uPIR8Opj4zt_oBlqJ8s'; 
+const applicationServerPublicKey = 'BEmPvxP7HAjio_qu1T85wVt3RWExgDtHwwJHo7qd59ss8VPp74MX9RNvUx2kebcdI-5kt2pCDAaZs5w9XbLQJd8'; 
 
 const pushButton = document.querySelector('.js-push-btn');
 const pushResubscribeButton = document.querySelector('.js-subscribepush-btn');
@@ -32,8 +32,9 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
   .then(function(swReg) {
     console.log('Service Worker is registered', swReg);
     swRegistration = swReg;
-    initializeUI();
-    InitialzeResubscribe(); //3rd subscription
+    initializeUI(); //  calls subscribe
+    initialzeResubscribe(); //3rd subscription
+    initializeValidateBugButton();
   })
   .catch(function(error) {
     console.error('Service Worker Error', error);
@@ -169,7 +170,7 @@ function DisplaySubscriptionInformation(subscription, subs_num) {
     subscriptionJson = document.querySelector('.js-subscription-details');
   }
   if (subscription) {
-    subscriptionJson.textContent = subscription.endpoint;  
+    subscriptionJson.textContent = JSON.stringify(subscription); //subscription.endpoint;  
   } else {
     subscriptionJson.textContent = '';
   }
@@ -200,11 +201,15 @@ function unsubscribeUser() {
     GetAndDisplaySWSubsEndpoint('subs1');
     GetAndDisplaySWSubsEndpoint('subs2');
     GetAndDisplaySWSubsEndpoint('subs3'); //changes made
+
+    let validationResults = document.getElementById("validationResult");
+    validationResults.textContent = '';
+
   });
 }
 
 //------------3rd SUBSCRIPTION-----------------------------------------------------------------------
-function InitialzeResubscribe() {
+function initialzeResubscribe() {
   pushResubscribeButton.addEventListener('click', function() {
     //subscribe the user
     resubscribeUser('subs3');
@@ -230,4 +235,27 @@ function resubscribeUser() {
     console.log('Failed to subscribe the user: ', err);
   });
 }
+
+function initializeValidateBugButton() {
+
+  const validateBugButton = document.getElementById('validateBugButton');
+
+  const swsubs1 = document.getElementById('swsubs1');
+  const swsubs2 = document.getElementById('swsubs2');
+
+  let validationResult = document.getElementById("validationResult");
+
+  validateBugButton.addEventListener('click', function() {
+
+    if( swsubs1.textContent === swsubs2.textContent )
+    {
+      validationResult.textContent = "SW Endpoint SAME";
+    }
+    else
+    {
+      validationResult.textContent = "SW Endpoint CHANGED! - Bug";
+    }
+  });
+
+};
     

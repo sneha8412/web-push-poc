@@ -28,3 +28,9 @@ self.addEventListener('notificationclick', function(event) {
         clients.openWindow('https://www.microsoft.com/')
     );
 });
+
+self.addEventListener("pushsubscriptionchange", event => {
+
+  console.log("Subscription was changed:" + JSON.stringify(event));
+
+}, false);
