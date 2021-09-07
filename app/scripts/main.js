@@ -34,7 +34,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
     swRegistration = swReg;
     initializeUI(); //  calls subscribe
     initialzeResubscribe(); //3rd subscription
-    initializeValidateBugButton();
+    initializeValidateBugButton(); //validate if there is a bug
   })
   .catch(function(error) {
     console.error('Service Worker Error', error);
@@ -236,6 +236,7 @@ function resubscribeUser() {
   });
 }
 
+//-------------------Validate Bug Button-------------------------
 function initializeValidateBugButton() {
 
   const validateBugButton = document.getElementById('validateBugButton');
