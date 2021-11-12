@@ -59,7 +59,13 @@ function initializeUI() {
       //subscribe the user
       //subscribeUser('subs1');
       //subscribeUser('subs2');
-      documentSubscribeTwoPushsWithOptions();
+      //documentSubscribeTwoPushsWithOptions();
+
+      const options = {
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerPublicKey
+      }
+      workerSubscribePushWithOptions(options);
     }
   });
   swRegistration.pushManager.getSubscription()
@@ -135,6 +141,36 @@ function documentSubscribeTwoPushsWithOptions() {
 
     });
 }
+//-----------------------Subscribe From Service Worker---------------------------
+function workerSubscribePushWithOptions(options) {
+  navigator.serviceWorker
+    .ready.then(swRegistration => {
+        swRegistration.active.postMessage({
+          command: "subscribe-multiple-times",
+          options
+        });
+    }).catch(function(err){
+      console.log("Error sending message to service worker: ", err);
+    });
+}
+
+navigator.serviceWorker.addEventListener("message", event => {
+  const subscriptions = JSON.parse(event.data);
+  //const subscriptions = subscriptionsData.subscriptions;
+  let num = 1;
+  subscriptions.forEach(sub => {
+    //console.log('User is subscribed.');
+    let subs_num = `subs${num}`;
+    DisplaySubscriptionInformation(sub, subs_num);
+    isSubscribed = true;
+    updateBtn();
+    //call the getsubscription() and return the output on the webpage for each subs
+    GetAndDisplaySWSubsEndpoint(subs_num);
+    num += 1;
+  });
+
+});
+
 
 //-----------SUBSCRIBE USER-----------------------------------------------
 function subscribeUser(subs_num) {

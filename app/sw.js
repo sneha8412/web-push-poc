@@ -1,6 +1,39 @@
 
 'use strict';
 
+self.onmessage = event => {
+  switch (event.data.command) {
+    case "subscribe-multiple-times":
+      subscribeMultipleTimes(event.data.options);
+      break;
+
+    default:
+      sendMessageToClients("message", "error - unknown message request");
+      break;
+  }
+};
+
+function subscribeMultipleTimes(options){
+  let subscribePromises = [];
+  subscribePromises.push(self.registration.pushManager.subscribe(options));
+  subscribePromises.push(self.registration.pushManager.subscribe(options));
+  
+  Promise.all(subscribePromises)
+  .then(subscriptions => {
+
+    clients.matchAll({ includeUncontrolled: true })
+    .then(clients =>
+      clients.forEach(client => {
+        let subscriptionArray = JSON.stringify(subscriptions);
+        client.postMessage(subscriptionArray);
+      })
+      , error => console.log(error));
+
+  }).catch(function(err){
+    console.log('service wofrker Failed to subscribe: ', err);
+  });
+}
+
 self.addEventListener('push', function(event) {
     console.log('[Service Worker] Push Received.');
     console.log("event: " + event);
