@@ -57,8 +57,9 @@ function initializeUI() {
       //unsubscribeUser('subs2');
     } else {
       //subscribe the user
-      subscribeUser('subs1');
-      subscribeUser('subs2');
+      //subscribeUser('subs1');
+      //subscribeUser('subs2');
+      documentSubscribeTwoPushsWithOptions();
     }
   });
   swRegistration.pushManager.getSubscription()
@@ -92,6 +93,48 @@ function updateBtn() {
   pushButton.disabled = false;
 }
 
+function documentSubscribeTwoPushsWithOptions() {
+  let subscription_promises = [];
+  const options = {
+    userVisibleOnly: true,
+    applicationServerKey: applicationServerPublicKey
+  }
+
+  navigator.serviceWorker.ready
+    .then(swReg => {
+      subscription_promises.push(swReg.pushManager.subscribe(options));
+      subscription_promises.push(swReg.pushManager.subscribe(options));
+
+      Promise.allSettled(subscription_promises)
+      .then(subscriptions => {
+  
+        let num = 1;
+  
+        subscriptions.forEach(sub => {
+          console.log('User is subscribed.');
+          
+          let subs_num = `subs${num}`;
+
+          //console.log(sub.endpoint);
+      
+          DisplaySubscriptionInformation(sub, subs_num);
+      
+          isSubscribed = true;
+      
+          updateBtn();
+      
+          //call the getsubscription() and return the output on the webpage for each subs
+          GetAndDisplaySWSubsEndpoint(subs_num)
+  
+          num += 1;
+        });
+      }).catch(function(err){
+        console.log('Failed to subscribe the user: ', err);
+        updateBtn();
+      });
+
+    });
+}
 
 //-----------SUBSCRIBE USER-----------------------------------------------
 function subscribeUser(subs_num) {
