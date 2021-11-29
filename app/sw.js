@@ -28,7 +28,6 @@ function subscribeMultipleTimes(options){
         client.postMessage(subscriptionArray);
       })
       , error => console.log(error));
-
   }).catch(function(err){
     console.log('service wofrker Failed to subscribe: ', err);
   });

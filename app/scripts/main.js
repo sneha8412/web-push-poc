@@ -61,11 +61,13 @@ function initializeUI() {
       //subscribeUser('subs2');
       //documentSubscribeTwoPushsWithOptions();
 
-      const options = {
-        userVisibleOnly: true,
-        applicationServerKey: applicationServerPublicKey
-      }
-      workerSubscribePushWithOptions(options);
+      // const options = {
+      //   userVisibleOnly: true,
+      //   applicationServerKey: applicationServerPublicKey
+      // }
+      // workerSubscribePushWithOptions(options);
+
+      documentSubscribePushWithAppServerKeys();
     }
   });
   swRegistration.pushManager.getSubscription()
@@ -171,6 +173,39 @@ navigator.serviceWorker.addEventListener("message", event => {
 
 });
 
+//------------SUBSCRIBE WITH DIFFERENT APPLICATION SERVER KEYS -------------------
+function documentSubscribePushWithAppServerKeys() {
+  let subscription_promises = [];
+  //const appServerKeys = JSON.parse('[ 'I\u008F\u00BF\u0013\u00FB\u001C\b\u00E2\u00A3\u00FA\u00AE\u00D5?9\u00C1[wEa1\u20AC;G\u00C3\u0002G\u00A3\u00BA\u009D\u00E7\u00DB,\u00F1S\u00E9\u00EF\u0192\u0017\u00F5\u0013oS\u001D\u00A4y\u00B7\u001D#\u00EEd\u00B7jB\f\u0006\u2122\u00B3\u0153=]\u00B2\u00D0%\u00DF', 'I\u008F\u00BF\u0013\u00FB\u001C\b\u00E2\u00A3\u00FA\u00AE\u00D5?9\u00C1[wEa1\u20AC;G\u00C3\u0002G\u00A3\u00BA\u009D\u00E7\u00DB,\u00F1S\u00E9\u00EF\u0192\u0017\u00F5\u0013oS\u001D\u00A4y\u00B7\u001D#\u00EEd\u00B7jB\f\u0006\u2122\u00B3\u0153=]\u00B2\u00D0%\u00DF', 'I\u008F\u00BF\u0013\u00FB\u001C\b\u00E2\u00A3\u00FA\u00AE\u00D5?9\u00C1[wEa1\u20AC;G\u00C3\u0002G\u00A3\u00BA\u009D\u00E7\u00DB,\u00F1S\u00E9\u00EF\u0192\u0017\u00F5\u0013oS\u001D\u00A4y\u00B7\u001D#\u00EEd\u00B7jB\f\u0006\u2122\u00B3\u0153=]\u00B2\u00D0%\u00DF' ]');
+  const appServerKeys = [ applicationServerPublicKey, 'AMv56cECmmmgQbtWB8fSleb7tEr_Cl-ry2Nvg_5zppkIKRTb-FFwrUrYa4kMvOLNZVMeF6jdLMvnWzRMKTyAvAg', 'AIJdz-y7xieDL4W667OBH9gjhy4IQ3P3mpy07vZ62I_Zuc8sBHYTx57FP8PS5UAqTJtzmxK6EvW8vj0jpegR15A'];
+  navigator.serviceWorker.ready
+    .then(swRegistration => {
+      for (let i = 0; i < appServerKeys.length; ++i) {
+        let options = {
+          userVisibleOnly: true,
+          applicationServerKey: appServerKeys[i]
+        };
+        subscription_promises.push(swRegistration.pushManager.subscribe(options));
+      }
+      /*
+      Promise.all(subscription_promises.map(p => p.catch(e => e?.stack))).then(s => {
+        console.log(JSON.stringify(s));
+      }).catch((err) => {
+        console.log(err);
+      });
+      */
+      Promise.allSettled(subscription_promises)
+        .then(results => {
+          console.log(JSON.stringify(results));
+          const subscription = results[0];
+          const error = `${results[1].status} - ${results[1].reason.stack}`;
+          const resultList = JSON.stringify([subscription, error]);
+          console.log(`${resultList}`);
+        }).catch((err) => { 
+          console.log("error waiting for subscribe promises" + err) });
+    }).catch((err) => { 
+      console.log("error SW ready" + err)});
+}
 
 //-----------SUBSCRIBE USER-----------------------------------------------
 function subscribeUser(subs_num) {
